@@ -1,0 +1,26 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model terms {
+  id                Int @id @default(autoincrement())
+  name              String @db.VarChar(100)
+  description       String?
+  parent_id         Int?
+  parent            terms? @relation("ParentChild", fields: [parent_id], references: [id])
+  subterms          terms[] @relation("ParentChild")
+  texonomy          String @db.VarChar(45)
+  action_taken_by   Json?
+  business_id       Int?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+  deleted_at        DateTime
+}
