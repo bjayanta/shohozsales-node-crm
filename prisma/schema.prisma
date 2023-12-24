@@ -24,6 +24,7 @@ model terms {
   updated_at        DateTime @updatedAt
   deleted_at        DateTime?
 
-  @@index([name, created_at]) // Composite Index
-  @@index([texonomy, created_at]) // Composite Index
+  // Index
+  @@index([name])
+  @@index([texonomy])
 }

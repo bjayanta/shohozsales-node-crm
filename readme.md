@@ -15,10 +15,11 @@ This is a microservice. This service only responsible for only "Manage contact".
 
 Create migration
 
-> npx prisma migrate dev --name=<migration_file_name>
+> npx prisma migrate dev --name <migration_file_name>
+> npx prisma db push
 
 Database seed
 
-> npm ts-node <src/create.ts>
+> npx ts-node <src/create.ts>
 
 Thank you.
