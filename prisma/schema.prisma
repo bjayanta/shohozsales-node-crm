@@ -13,7 +13,7 @@ datasource db {
 model terms {
   id                Int @id @default(autoincrement())
   name              String @db.VarChar(100)
-  description       String?
+  description       String? @db.Text
   parent_id         Int?
   parent            terms? @relation("ParentChild", fields: [parent_id], references: [id])
   subterms          terms[] @relation("ParentChild")
@@ -22,5 +22,8 @@ model terms {
   business_id       Int?
   created_at        DateTime @default(now())
   updated_at        DateTime @updatedAt
-  deleted_at        DateTime
+  deleted_at        DateTime?
+
+  @@index([name, created_at]) // Composite Index
+  @@index([texonomy, created_at]) // Composite Index
 }
