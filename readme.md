@@ -20,6 +20,6 @@ Create migration
 
 Database seed
 
-> npx ts-node <src/create.ts>
+> npx ts-node <prisma/seeders/create>
 
 Thank you.
