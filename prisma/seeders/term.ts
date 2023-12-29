@@ -11,7 +11,7 @@ const TermSeeder = async () => {
         {name: 'Lead', description: 'n/a', texonomy: 'Contact', action_taken_by: {created_by: 1}, business_id: 1}
     ];
 
-    const res = await prisma.terms.createMany({
+    const res = await prisma.term.createMany({
         data,
         skipDuplicates: true
     });

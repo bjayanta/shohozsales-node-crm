@@ -10,13 +10,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model terms {
+model Term {
   id                Int @id @default(autoincrement())
   name              String @db.VarChar(100)
   description       String? @db.Text
   parent_id         Int?
-  parent            terms? @relation("ParentChild", fields: [parent_id], references: [id])
-  subterms          terms[] @relation("ParentChild")
+  parent            Term? @relation("ParentChild", fields: [parent_id], references: [id])
+  subterms          Term[] @relation("ParentChild")
   texonomy          String @db.VarChar(45)
   action_taken_by   Json?
   business_id       Int?
@@ -27,4 +27,6 @@ model terms {
   // Index
   @@index([name])
   @@index([texonomy])
+
+  @@map("terms")
 }

@@ -13,9 +13,16 @@ This is a microservice. This service only responsible for only "Manage contact".
 
 ## Command
 
+Installation
+
+> npm install --save prisma express
+>
+> npm install --save-dev @types/node ts-node typescript @types/express
+
 Create migration
 
 > npx prisma migrate dev --name <migration_file_name>
+>
 > npx prisma db push
 
 Database seed
