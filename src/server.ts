@@ -1,9 +1,8 @@
-import { PrismaClient } from "@prisma/client";
 import express, {NextFunction, Request, Response} from "express";
 import routes from "./routes/routes";
 import HttpException from "./utils/http-exception";
+import fs from "fs";
 
-const prisma = new PrismaClient()
 const app = express()
 
 // app.use(cors())
@@ -11,6 +10,15 @@ app.use(express.json())
 app.use(express.urlencoded({
     extended: true,
 }))
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+    fs.appendFile('log.txt', `${Date.now()} ${req.ip} ${req.method} ${req.path}\n`, (err: any) => {
+        if (err) throw err;
+    })
+
+    return next()
+})
+
 app.use(routes)
 app.use(express.static('public'))
 
@@ -25,23 +33,11 @@ app.get('/blog', (req:any, res:any) => {
     res.send('Hello blog. I am Jayanta.');
 });
 
-app.post('/',async (req: any, res: any) => {
-    try {
-        const term = await prisma.term.create({
-            data: req.body
-        })
-
-        res.status(200).send(term)
-    } catch (error) {
-        res.status(500).send(null)
-    }
-})
-
 app.use((err: HttpException, req: Request, res: Response, next: NextFunction) => {
     if (err && err.errorCode) {
-        res.status(err.errorCode).json(err.message);
+        return res.status(err.errorCode).json(err.message);
     } else if(err) {
-        res.status(500).json(err.message);
+        return res.status(500).json(err.message);
     }
 })
 
