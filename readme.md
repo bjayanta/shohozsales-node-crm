@@ -4,8 +4,8 @@ This is a microservice. This service only responsible for only "Manage contact".
 
 ## Todo
 
-- Setup
-- Term module
+- (Done) Setup
+- (Done) Term module
 - Location + Address module
 - Contact module
 - Lead module

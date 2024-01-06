@@ -31,3 +31,68 @@ model Term {
   @@index([texonomy])
   @@map("terms")
 }
+
+model Division {
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(25)
+  bn_name         String    @db.VarChar(25)
+  url             String?   @db.VarChar(50)
+
+  districts District[]
+
+  @@index([name])
+  @@index([bn_name])
+
+  @@map("divisions")
+}
+
+model District {
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(25)
+  bn_name         String    @db.VarChar(25)
+  lat             String    @db.VarChar(15)
+  lon             String    @db.VarChar(15)
+  url             String?   @db.VarChar(50)
+
+  division_id     Int?
+  division        Division? @relation(fields: [division_id], references: [id], onDelete: Cascade)
+
+  upazilas Upazila[]
+
+  @@index([name])
+  @@index([bn_name])
+
+  @@map("districts")
+}
+
+model Upazila {
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(25)
+  bn_name         String    @db.VarChar(25)
+  url             String?   @db.VarChar(50)
+
+  district_id     Int?
+  district        District? @relation(fields: [district_id], references: [id], onDelete: Cascade)
+
+  unions          Union[]
+
+  @@index([name])
+  @@index([bn_name])
+
+  @@map("upazilas")
+}
+
+model Union {
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(25)
+  bn_name         String    @db.VarChar(25)
+  url             String?   @db.VarChar(50)
+
+  upazilla_id     Int?
+  upazilla        Upazila? @relation(fields: [upazilla_id], references: [id], onDelete: Cascade)
+
+  @@index([name])
+  @@index([bn_name])
+
+  @@map("unions")
+}

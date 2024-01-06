@@ -6,7 +6,9 @@ const prisma = new PrismaClient()
 // All records
 export const records = async () => {
     const terms = await prisma.term.findMany({
-        where: {parent_id: null},
+        where: {
+            parent_id: null
+        },
         include: {
             subterms: {
                 select: {
