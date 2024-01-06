@@ -19,6 +19,8 @@ model Term {
   parent          Term?     @relation("ParentChild", fields: [parent_id], references: [id], onDelete: Cascade)
   
   subterms        Term[]    @relation("ParentChild")
+
+  contacts           ContactsOnTerms[]
   
   texonomy        String    @db.VarChar(45)
   action_taken_by Json?
@@ -38,7 +40,8 @@ model Division {
   bn_name         String    @db.VarChar(25)
   url             String?   @db.VarChar(50)
 
-  districts District[]
+  districts       District[]
+  contacts        Contact[]
 
   @@index([name])
   @@index([bn_name])
@@ -57,7 +60,8 @@ model District {
   division_id     Int?
   division        Division? @relation(fields: [division_id], references: [id], onDelete: Cascade)
 
-  upazilas Upazila[]
+  upazilas        Upazila[]
+  contacts        Contact[]
 
   @@index([name])
   @@index([bn_name])
@@ -75,6 +79,7 @@ model Upazila {
   district        District? @relation(fields: [district_id], references: [id], onDelete: Cascade)
 
   unions          Union[]
+  contacts        Contact[]
 
   @@index([name])
   @@index([bn_name])
@@ -91,8 +96,62 @@ model Union {
   upazilla_id     Int?
   upazilla        Upazila? @relation(fields: [upazilla_id], references: [id], onDelete: Cascade)
 
+  contacts        Contact[]
+
   @@index([name])
   @@index([bn_name])
 
   @@map("unions")
+}
+
+model Contact {
+  id              Int       @id @default(autoincrement())
+  first_name      String    @db.VarChar(100)
+  last_name       String    @db.VarChar(100)
+  date_of_birth   DateTime?
+  bio             String?   @db.Text
+  mobile          String    @db.VarChar(25)
+
+  division_id     Int?
+  division        Division? @relation(fields: [division_id], references: [id])
+  district_id     Int?
+  district        District? @relation(fields: [district_id], references: [id])
+  upazilla_id     Int?
+  upazilla        Upazila?  @relation(fields: [upazilla_id], references: [id])
+  union_id        Int?
+  union           Union?    @relation(fields: [union_id], references: [id])
+  address         String?   @db.Text
+  
+  parent_id       Int?
+  parent          Contact?  @relation("ParentChild", fields: [parent_id], references: [id], onDelete: Cascade)
+  children        Contact[] @relation("ParentChild")
+  relation        String?
+
+  initial_balance Decimal   @db.Decimal(10, 2) @default(0.00)
+  current_balance Decimal   @db.Decimal(10, 2) @default(0.00)
+
+  terms           ContactsOnTerms[]
+
+  properties      Json?     @db.Json // can add more `mobile number`, `address`, `social media details` etc
+  action_taken_by Json?     @db.Json
+  business_id     Int
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  deleted_at      DateTime?
+
+  @@index([mobile])
+
+  @@map("contacts")
+}
+
+model ContactsOnTerms {
+  contact         Contact   @relation(fields: [contact_id], references: [id])
+  contact_id      Int // relation scalar field (used in the `@relation` attribute above)
+
+  term            Term      @relation(fields: [term_id], references: [id])
+  term_id         Int // relation scalar field (used in the `@relation` attribute above)
+
+  @@id([contact_id, term_id])
+
+  @@map("contacts_on_terms")
 }

@@ -1,11 +1,18 @@
 import { PrismaClient } from "@prisma/client";
 import TermSeeder from "./term";
+import DivisionSeeder from "./division";
+import DistrictSeeder from "./district";
+import UpazilaSeeder from "./upazila";
+import UnionSeeder from "./union";
 
 const prisma = new PrismaClient();
 
 async function main () {
-    // Terms
-    await TermSeeder();
+    // await TermSeeder();
+    // await DivisionSeeder();
+    // await DistrictSeeder();
+    // await UpazilaSeeder();
+    await UnionSeeder();
 }
 
 main()
