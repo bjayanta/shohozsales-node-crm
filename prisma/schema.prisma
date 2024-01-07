@@ -10,6 +10,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum TransactionType {
+  PAY
+  RECEIVE
+}
+
 model Term {
   id              Int       @id @default(autoincrement())
   name            String    @db.VarChar(100)
@@ -20,7 +25,7 @@ model Term {
   
   subterms        Term[]    @relation("ParentChild")
 
-  contacts           ContactsOnTerms[]
+  contacts        ContactsOnTerms[]
   
   texonomy        String    @db.VarChar(45)
   action_taken_by Json?
@@ -104,6 +109,24 @@ model Union {
   @@map("unions")
 }
 
+model Company {
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(100)
+  email           String?   @db.VarChar(100)
+  url             String?   @db.VarChar(100)
+
+  contacts        Contact[]
+
+  properties      Json?     @db.Json // can add `address`, `contact details` etc
+  action_taken_by Json?     @db.Json
+  business_id     Int
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  deleted_at      DateTime?
+
+  @@map("companies")
+}
+
 model Contact {
   id              Int       @id @default(autoincrement())
   first_name      String    @db.VarChar(100)
@@ -111,6 +134,7 @@ model Contact {
   date_of_birth   DateTime?
   bio             String?   @db.Text
   mobile          String    @db.VarChar(25)
+  email           String?   @db.VarChar(100)
 
   division_id     Int?
   division        Division? @relation(fields: [division_id], references: [id])
@@ -131,6 +155,10 @@ model Contact {
   current_balance Decimal   @db.Decimal(10, 2) @default(0.00)
 
   terms           ContactsOnTerms[]
+  transactions    Transaction[]
+
+  company_id      Int?
+  company         Company? @relation(fields: [company_id], references: [id])
 
   properties      Json?     @db.Json // can add more `mobile number`, `address`, `social media details` etc
   action_taken_by Json?     @db.Json
@@ -154,4 +182,24 @@ model ContactsOnTerms {
   @@id([contact_id, term_id])
 
   @@map("contacts_on_terms")
+}
+
+model Transaction {
+  id              Int       @id @default(autoincrement())
+  amount          Decimal   @db.Decimal(10, 2) @default(0.00)
+  trx_type        TransactionType
+  trx_method      String    @db.VarChar(45) // Cash, Bank Transfer, Cheque, bKash etc
+
+  contact_id      Int
+  contact         Contact?  @relation(fields: [contact_id], references: [id])
+
+  remark          String?   @db.Text
+  properties      Json?     @db.Json // additional details
+  action_taken_by Json?     @db.Json
+  business_id     Int
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  deleted_at      DateTime?
+
+  @@map("transactions")
 }
