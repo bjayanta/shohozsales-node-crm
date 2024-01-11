@@ -2,7 +2,9 @@ import express, {NextFunction, Request, Response} from "express";
 import routes from "./routes/routes";
 import HttpException from "./utils/http-exception";
 import fs from "fs";
-import http from "http";
+
+const authCheck = require('./middlewares/authCheck')
+// import { authCheck } from "./middlewares/authCheck";
 
 const app = express()
 
@@ -12,37 +14,17 @@ app.use(express.urlencoded({
     extended: true,
 }))
 
-app.use((req: Request, res: Response, next: NextFunction) => {
-    const request = http.request({}, (res) => {
-        let data = '';
-
-        res.on('data', (chunk) => {
-            data += chunk;
-        });
-
-        res.on('end', () => {
-            console.log(data);
-        });
-    })
-
-    request.end()
-
-    return next();
-})
-
-app.use((req: Request, res: Response, next: NextFunction) => {
-    fs.appendFile('log.txt', `${Date.now()} ${req.ip} ${req.method} ${req.path}\n`, (err: any) => {
-        if (err) throw err;
-    })
-
-    return next()
-})
-
+app.use(authCheck)
 app.use(routes)
 app.use(express.static('public'))
 
 app.use((err: HttpException, req: Request, res: Response, next: NextFunction) => {
     if (err && err.errorCode) {
+        // Set error log
+        fs.appendFile('log.txt', `${Date.now()} ${err.message} ${req.path}\n`, (err: any) => {
+            if (err) throw err;
+        })
+
         return res.status(err.errorCode).json(err.message);
     } else if(err) {
         return res.status(500).json(err.message);

@@ -8,10 +8,10 @@ import UnionSeeder from "./union";
 const prisma = new PrismaClient();
 
 async function main () {
-    // await TermSeeder();
-    // await DivisionSeeder();
-    // await DistrictSeeder();
-    // await UpazilaSeeder();
+    await TermSeeder();
+    await DivisionSeeder();
+    await DistrictSeeder();
+    await UpazilaSeeder();
     await UnionSeeder();
 }
 

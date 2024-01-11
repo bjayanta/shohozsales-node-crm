@@ -7,7 +7,7 @@ const router = Router();
 router.get('/terms', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const terms = await records()
-        res.json({ terms })
+        res.json({ data: terms })
     } catch (error) {
         next(error);
     }
@@ -17,7 +17,7 @@ router.get('/terms', async (req: Request, res: Response, next: NextFunction) => 
 router.post('/terms', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const term = await store(req.body)
-        res.json({ term })
+        res.json({ data: term })
     } catch (error) {
         next(error);
     }
@@ -36,7 +36,7 @@ router.get('/terms/:id', async (req: Request, res: Response, next: NextFunction)
 })
 
 // Update the specified resource in storage.
-router.patch('/terms/:id', async (req: Request, res: Response, next: NextFunction) => {
+router.put('/terms/:id', async (req: Request, res: Response, next: NextFunction) => {
     const id = Number(req.params.id);
 
     try {

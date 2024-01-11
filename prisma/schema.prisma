@@ -10,7 +10,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum TransactionType {
+enum GenderEnum {
+  Male
+  Female
+  Others
+}
+
+enum ReligionEnum {
+  Buddhism
+  Islam
+  Christianity
+  Hinduism
+  Sikhism
+}
+
+enum RelationEnum {
+  Father
+  Mother
+  Brother
+  Sister
+  Friend
+  Uncle
+  Aunty
+  Cousin
+}
+
+enum TransactionEnum {
   PAY
   RECEIVE
 }
@@ -27,7 +52,7 @@ model Term {
 
   contacts        ContactsOnTerms[]
   
-  texonomy        String    @db.VarChar(45)
+  taxonomy        String    @db.VarChar(45)
   action_taken_by Json?
   business_id     Int?
   created_at      DateTime  @default(now())
@@ -35,7 +60,7 @@ model Term {
   deleted_at      DateTime?
 
   @@index([name])
-  @@index([texonomy])
+  @@index([taxonomy])
   @@map("terms")
 }
 
@@ -98,8 +123,8 @@ model Union {
   bn_name         String    @db.VarChar(25)
   url             String?   @db.VarChar(50)
 
-  upazilla_id     Int?
-  upazilla        Upazila? @relation(fields: [upazilla_id], references: [id], onDelete: Cascade)
+  upazila_id      Int?
+  upazila         Upazila? @relation(fields: [upazila_id], references: [id], onDelete: Cascade)
 
   contacts        Contact[]
 
@@ -132,6 +157,8 @@ model Contact {
   first_name      String    @db.VarChar(100)
   last_name       String    @db.VarChar(100)
   date_of_birth   DateTime?
+  gender          GenderEnum
+  religion        ReligionEnum?
   bio             String?   @db.Text
   mobile          String    @db.VarChar(25)
   email           String?   @db.VarChar(100)
@@ -140,8 +167,8 @@ model Contact {
   division        Division? @relation(fields: [division_id], references: [id])
   district_id     Int?
   district        District? @relation(fields: [district_id], references: [id])
-  upazilla_id     Int?
-  upazilla        Upazila?  @relation(fields: [upazilla_id], references: [id])
+  upazila_id      Int?
+  upazila         Upazila?  @relation(fields: [upazila_id], references: [id])
   union_id        Int?
   union           Union?    @relation(fields: [union_id], references: [id])
   address         String?   @db.Text
@@ -149,7 +176,7 @@ model Contact {
   parent_id       Int?
   parent          Contact?  @relation("ParentChild", fields: [parent_id], references: [id], onDelete: Cascade)
   children        Contact[] @relation("ParentChild")
-  relation        String?
+  relation        RelationEnum?
 
   initial_balance Decimal   @db.Decimal(10, 2) @default(0.00)
   current_balance Decimal   @db.Decimal(10, 2) @default(0.00)
@@ -187,7 +214,7 @@ model ContactsOnTerms {
 model Transaction {
   id              Int       @id @default(autoincrement())
   amount          Decimal   @db.Decimal(10, 2) @default(0.00)
-  trx_type        TransactionType
+  trx_type        TransactionEnum
   trx_method      String    @db.VarChar(45) // Cash, Bank Transfer, Cheque, bKash etc
 
   contact_id      Int

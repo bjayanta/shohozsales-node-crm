@@ -13,6 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^5.7.1",
+    "axios": "^1.6.5",
+    "cls-hooked": "^4.2.2",
     "express": "^4.18.2"
   },
   "devDependencies": {

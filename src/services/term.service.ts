@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { TermInput } from "../models/term.model";
+import { ActionTakenBy, TermInput } from "../models/term.model";
+import { JsonObject } from "@prisma/client/runtime/library";
 
 const prisma = new PrismaClient()
 
@@ -26,16 +27,18 @@ export const records = async () => {
 // Store
 export const store = async (inputs: TermInput) => {
     const name = inputs.name.trim();
+    const action_taken_by = {
+        'created_by': Number(inputs.user.id)
+    }
 
     const term = await prisma.term.create({
         data: {
             name,
             description         : inputs.description,
             parent_id           : inputs.parent_id,
-            texonomy            : inputs.texonomy,
-            action_taken_by     : inputs.action_taken_by,
-            business_id         : inputs.business_id,
-            deleted_at          : inputs.deleted_at
+            taxonomy            : inputs.taxonomy,
+            action_taken_by     : action_taken_by,
+            business_id         : Number(inputs.user.businesses[0].id)
         }, 
         include: {
             parent: {
@@ -81,16 +84,24 @@ export const show = async (id: number) => {
 export const update = async (inputs: TermInput, id: number) => {
     const name = inputs.name.trim();
 
-    const term = await prisma.term.update({
+    const term = await prisma.term.findUnique({
+        where: {id: id},
+        select: {
+            action_taken_by: true
+        }
+    })
+
+    const action_taken_by = term?.action_taken_by as JsonObject;
+    action_taken_by['updated_by'] = Number(inputs.user.id)
+
+    const data = await prisma.term.update({
         where: {id: id},
         data: {
             name,
             description         : inputs.description,
             parent_id           : inputs.parent_id,
-            texonomy            : inputs.texonomy,
-            action_taken_by     : inputs.action_taken_by,
-            business_id         : inputs.business_id,
-            deleted_at          : inputs.deleted_at
+            taxonomy            : inputs.taxonomy,
+            action_taken_by     : action_taken_by
         },
         include: {
             parent: {
@@ -110,14 +121,20 @@ export const update = async (inputs: TermInput, id: number) => {
         }
     })
 
-    return term
+    return { data }
 }
 
 // Remove
 export const destroy = async (id: number) => {
-    const term = await prisma.term.delete({
-        where: {id: id}
-    });
+    try {
+        const data = await prisma.term.delete({
+            where: {id: id}
+        });
 
-    return term;
+        return { data };
+    } catch (error) {
+        return {
+            message: error
+        }
+    }
 }
